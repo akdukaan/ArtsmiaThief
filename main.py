@@ -14,7 +14,7 @@ from PIL import Image  # pip install Pillow
 # Here's an example of a request url https://iiif.dx.artsmia.org/102774.jpg/6144,4608,151,385/151,/0/default.jpg
 # The numbers before ".jpg" is the image id. (102774)
 # The width can be found by summing up the first and third numbers after ".jpg" (6144 + 151)
-# The height can be found by summing up the second and fourth numbers after ".jpg" (4608 + 395)
+# The height can be found by summing up the second and fourth numbers after ".jpg" (4608 + 385)
 
 image_id = 102774
 max_width = 6295
