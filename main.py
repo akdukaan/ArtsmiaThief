@@ -1,26 +1,32 @@
+import math
 import os
 import requests
-from PIL import Image # pip install Pillow
+from PIL import Image  # pip install Pillow
+
+# Just set these three
+max_height = 4993
+max_width = 6295
+image_id = 102774  # https://collections.artsmia.org/art/102774/forest-katayama-bokuyo
 
 
 def download_images():
     urls = []
-    # iterate through heights (do first column first)
-    for i in range(0, 4609, 512):
-        height = 512
+    # iterate through heights (we will do first row first)
+    for i in range(0, max_height, 512):
         width = 512
+        height = 512
         # iterate through widths
-        for j in range(0, 6145, 512):
-            if j == 6144:
-                height = 151
-            if i == 4608:
-                width = 385
-            urls.append("https://iiif.dx.artsmia.org/102774.jpg/" +
+        for j in range(0, max_width, 512):
+            if j > max_width - 512:
+                width = max_width - j
+            if i > max_height - 512:
+                height = max_height - i
+            urls.append("https://iiif.dx.artsmia.org/" + str(image_id) + ".jpg/" +
                         str(j) + "," +
                         str(i) + "," +
-                        str(height) + "," +
-                        str(width) + "/" +
-                        str(height) + ",/0/default.jpg")
+                        str(width) + "," +
+                        str(height) + "/" +
+                        str(width) + ",/0/default.jpg")
 
     # Create images directory if not exists
     if not os.path.exists('images'):
@@ -42,8 +48,9 @@ def download_image(url, filename):
 
 
 def combine_images():
-    columns = 13
-    rows = 10
+    print("Combining images")
+    columns = math.ceil(max_width/512)
+    rows = math.ceil(max_height/512)
 
     # Define width and height based on first image
     first_image = Image.open("images/image_1.jpg")
