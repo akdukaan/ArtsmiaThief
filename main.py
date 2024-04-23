@@ -4,9 +4,21 @@ import requests
 from PIL import Image  # pip install Pillow
 
 # Just set these three
-max_height = 4993
+# Open developer settings and go to the networks tab
+# Zoom in all the way and go to the bottom right of the image
+# In the network requests, there should've been many response named default.jpg
+# You'll want to find the one that's the bottom right corner when it's zoomed in the most
+# That'll typically mean it has the smallest size and you can double click the thumbnail to verify
+# Single clicking on default.jpg will bring up a menu named headers.
+# In the headers menu, find the request URL. 
+# Here's an example of a request url https://iiif.dx.artsmia.org/102774.jpg/6144,4608,151,385/151,/0/default.jpg
+# The numbers before ".jpg" is the image id. (102774)
+# The width can be found by summing up the first and third numbers after ".jpg" (6144 + 151)
+# The height can be found by summing up the second and fourth numbers after ".jpg" (4608 + 395)
+
+image_id = 102774
 max_width = 6295
-image_id = 102774  # https://collections.artsmia.org/art/102774/forest-katayama-bokuyo
+max_height = 4993
 
 
 def download_images():
