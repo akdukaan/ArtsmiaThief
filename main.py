@@ -3,25 +3,45 @@ import os
 import requests
 from PIL import Image  # pip install Pillow
 
-# Just set these three
-# Open developer settings and go to the networks tab
-# Zoom in all the way and go to the bottom right of the image
-# In the network requests, there should've been many response named default.jpg
-# You'll want to find the one that's the bottom right corner when it's zoomed in the most
-# That'll typically mean it has the smallest size and you can double click the thumbnail to verify
-# Single clicking on default.jpg will bring up a menu named headers.
-# In the headers menu, find the request URL. 
-# Here's an example of a request url https://iiif.dx.artsmia.org/102774.jpg/6144,4608,151,385/151,/0/default.jpg
-# The numbers before ".jpg" is the image id. (102774)
-# The width can be found by summing up the first and third numbers after ".jpg" (6144 + 151)
-# The height can be found by summing up the second and fourth numbers after ".jpg" (4608 + 385)
-
+# Just set this. It should be in the URL
 image_id = 102774
-max_width = 6295
-max_height = 4993
 
 
-def download_images():
+def image_exists(width, height):
+    wquotient, wremainder = divmod(width, 512)
+    hquotient, hremainder = divmod(height, 512)
+    if wremainder == 0: wremainder += 512
+    if hremainder == 0: hremainder += 512
+    url = "https://iiif.dx.artsmia.org/" + str(image_id) + ".jpg/" + str(wquotient * 512) + "," + str(hquotient * 512) + "," + str(wremainder) + "," + str(hremainder) + "/" + str(wremainder) + ",/0/default.jpg"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return True
+    else:
+        return False
+
+
+def get_image_dimensions():
+    width = 0
+    while image_exists(width, 0):
+        width += 512
+    width += 512
+    while not image_exists(width, 0):
+        width -= 1
+    print("Found an image width of " + str(width))
+    
+    height = 0
+    while image_exists(0, height):
+        height += 512
+    height += 512
+    while not image_exists(0, height):
+        height -= 1
+    print("Found an image height of " + str(height))
+    
+    return width, height
+
+
+def download_images(max_width, max_height):
+    print("Downloading image pieces")
     urls = []
     # iterate through heights (we will do first row first)
     for i in range(0, max_height, 512):
@@ -54,19 +74,18 @@ def download_image(url, filename):
     if response.status_code == 200:
         with open(filename, 'wb') as f:
             f.write(response.content)
-        print(f"Downloaded {url} and saved as {filename}")
+        print(f"Downloaded {url} as {filename}")
     else:
         print(f"Failed to download image from {url}")
 
 
-def combine_images():
+def combine_images(max_width, max_height):
     print("Combining images")
     columns = math.ceil(max_width/512)
     rows = math.ceil(max_height/512)
 
-    # Define width and height based on first image
-    first_image = Image.open("images/image_1.jpg")
-    width, height = first_image.size
+    width = 512
+    height = 512
 
     # Create a new image to hold the combined image
     combined_image = Image.new("RGB", (width * columns, height * rows))
@@ -86,14 +105,14 @@ def combine_images():
             image_index += 1
 
     # Save the combined image
-    combined_image.save("combined_image.png")
-
-    print("Combined image created successfully!")
+    combined_image.save("full_resolution_image.png")
+    print("Full resolution image created successfully!")
 
 
 def main():
-    download_images()
-    combine_images()
+    width, height = get_image_dimensions()
+    download_images(width, height)
+    combine_images(width, height)
 
 
 # Press the green button in the gutter to run the script.
