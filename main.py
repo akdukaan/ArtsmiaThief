@@ -116,3 +116,4 @@ def main():
     download_images(width, height)
     combine_images(width, height)
 
+main()
