@@ -7,6 +7,7 @@ from PIL import Image  # pip install Pillow
 image_id = 102774
 
 
+
 def image_exists(width, height):
     wquotient, wremainder = divmod(width, 512)
     hquotient, hremainder = divmod(height, 512)
@@ -21,6 +22,7 @@ def image_exists(width, height):
 
 
 def get_image_dimensions():
+    print("Finding image dimensions")
     width = 0
     while image_exists(width, 0):
         width += 512
@@ -74,7 +76,7 @@ def download_image(url, filename):
     if response.status_code == 200:
         with open(filename, 'wb') as f:
             f.write(response.content)
-        print(f"Downloaded {url} as {filename}")
+        print(f"Downloaded {filename}")
     else:
         print(f"Failed to download image from {url}")
 
@@ -114,7 +116,3 @@ def main():
     download_images(width, height)
     combine_images(width, height)
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    main()
